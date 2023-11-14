@@ -94,7 +94,7 @@ def load_data(dir,classification = False):
         return train_data, train_Seglabel, test_data, test_Seglabel
 
 class ModelNetDataLoader(Dataset):
-    def __init__(self, data, labels, point_num=16, rot=False, use_buffer=True, use_voxel=False, rot_type="SO3"):
+    def __init__(self, data, labels, point_num=16, rot=False, use_buffer=True, use_voxel=False, rot_type="SO3", noise_std=0):
         self.data, self.labels = data, labels
         self.point_num = point_num
         self.o3dmodel={}
@@ -103,6 +103,10 @@ class ModelNetDataLoader(Dataset):
         self.use_buffer=use_buffer
         self.use_voxel=use_voxel
         self.rot_type = rot_type
+
+        self.noise_std = noise_std
+        if noise_std:
+            self.normal = torch.distributions.Normal(0, noise_std)
 
     def rotate_point_cloud_random_SO3(self, pc):
         roll, pitch, yaw = np.random.rand(3)*np.pi*2
@@ -137,6 +141,10 @@ class ModelNetDataLoader(Dataset):
 
         points = np.asarray(o3dpc.points).astype(np.float32) #2048,30
         norms = np.asarray(o3dpc.normals).astype(np.float32) #2048,30
+
+        if self.noise_std:
+            random_noise = self.normal.sample(torch.Size(points.shape))
+            points = points + random_noise.numpy().astype(np.float32)
 
         sel_pts_idx = np.random.choice(points.shape[0], size=self.point_num, replace=False).reshape(-1)
         points = points[sel_pts_idx]
@@ -210,7 +218,7 @@ class SegmentationLoader(Dataset):
 
 
 class ScanObjectNNDataLoader(Dataset):
-    def __init__(self, point, lb, num_classes=15,n_points=2048, rot=False, rot_type="SO3"):
+    def __init__(self, point, lb, num_classes=15,n_points=2048, rot=False, rot_type="SO3", noise_std=0):
         points = []
         normals = []
         for p in point:
@@ -227,6 +235,10 @@ class ScanObjectNNDataLoader(Dataset):
         self.rot = rot
         self.rot_type=rot_type
         
+        self.noise_std = noise_std
+        if noise_std:
+            self.normal = torch.distributions.Normal(0, noise_std)
+
     def __len__(self):
         return self.lb.shape[0]
     
@@ -255,7 +267,10 @@ class ScanObjectNNDataLoader(Dataset):
                 
             points = np.asarray(pc.points).astype(np.float32) #2048,30
             normals = np.asarray(pc.normals).astype(np.float32) #2048,30
-                
+
+        if noise_std:
+            random_noise = self.normal.sample(torch.Size(points.shape))
+            points = points + random.noise.numpy().asdtype(np.float32)
         
         return points, normals, self.lb[index]
 
