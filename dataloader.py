@@ -111,14 +111,14 @@ class ModelNetDataLoader(Dataset):
     def rotate_point_cloud_random_SO3(self, pc):
         roll, pitch, yaw = np.random.rand(3)*np.pi*2
         rot = R.from_euler('ZYX', (yaw, pitch, roll))
-        pc = pc.rotate(rot.as_dcm(),center=np.array([0,0,0]))
+        pc = pc.rotate(rot.as_matrix(),center=np.array([0,0,0]))
         return pc
 
     def rotate_point_cloud_random_z(self, pc):
         roll, pitch, yaw = np.random.rand(3)*np.pi*2
         pitch, yaw = 0,0
         rot = R.from_euler('ZYX', (yaw, pitch, roll))
-        pc = pc.rotate(rot.as_dcm(),center=np.array([0,0,0]))
+        pc = pc.rotate(rot.as_matrix(),center=np.array([0,0,0]))
 
         return pc
 
@@ -247,7 +247,7 @@ class ScanObjectNNDataLoader(Dataset):
         rot = R.from_euler('ZYX', (yaw, pitch, roll))
         # center = np.mean(np.asarray(pc.points).astype(np.float32),0, keepdims=True).T
         center = np.zeros((3,1))
-        pc = pc.rotate(rot.as_dcm(), center=center)
+        pc = pc.rotate(rot.as_matrix(), center=center)
 
         return pc
     
