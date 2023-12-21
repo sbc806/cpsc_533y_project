@@ -10,7 +10,7 @@
 
 2.  training
 
-    To run the NLGAT, the notebook run_nlgat.ipynb can be used.
+    To run the NLGAT, the notebook run_nlgat_clean.ipynb can be used.
 
     To run PointNet, the notebook run_pointnet.ipynb can be used.
 
