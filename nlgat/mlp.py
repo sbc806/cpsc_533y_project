@@ -1,3 +1,6 @@
+import torch
+import torch.nn as nn
+
 class Mlps(nn.Module):
     """Mlps implemented as (dxd) convolution."""
 
@@ -24,9 +27,7 @@ class Mlps(nn.Module):
                 self.layers.add_module(f"BN-{i}", nn.BatchNorm2d(outc))
                 self.layers.add_module(f"ReLU-{i}", nn.ReLU(inplace=True))
             inc = outc
-        if config.gsn_init == "he_1":
-            self.apply(self._init_weights_he_1)
-
+            
     def _init_weights_he_1(self, module):
         if isinstance(module, torch.nn.Conv2d):
             print('initializing He weights in {}'.format(module.__class__.__name__))
