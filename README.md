@@ -14,7 +14,6 @@
 
     To run PointNet, the notebook run_pointnet.ipynb can be used.
 
-    for training on ModelNet40 with reconstruction network:
     
     
 
